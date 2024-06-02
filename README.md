@@ -1,7 +1,7 @@
 - 👋 Hi, I’m @CaesarGian
 - 👀 I’m interested in Mobile Progamming and Game Developer
-- 🌱 I’m currently learning Mobile Learning
-- 💞️ I’m looking to collaborate on Google Developer Study Club
+- 🌱 I’m currently learning Programming
+- 💞️ I’m looking to collaborate on Advance Software Engineering
 - 📫 How to reach me ...
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
