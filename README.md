@@ -1,12 +1,7 @@
-- 👋 Hi, I’m @CaesarGian
-- 👀 I’m interested in Mobile Progamming and Game Developer
-- 🌱 I’m currently learning Programming
-- 💞️ I’m looking to collaborate on Advance Software Engineering
-- 📫 How to reach me ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
+Aplikasi Kantin Tel-U
 
-<!---
-CaesarGian/CaesarGian is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-You can click the Preview link to take a look at your changes.
---->
+Deskripsi: Aplikasi digunakan untuk pencatatan transaksi dari tenant. Pengguna aplikasi adalah admin kantin.
+Spesifikasi:
+Pengguna bisa melakukan penambahan, pengubahan, dan penghapusan data tenant. 
+Pengguna bisa mencatat transaksi dari tenant dan menghitung jumlah uang yang diperoleh tenant dan admin kantin. Admin kantin memperoleh 25% dari setiap transaksi.
+Pengguna bisa menampilkan daftar tenant secara terurut berdasarkan banyak transaksi
