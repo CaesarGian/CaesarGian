@@ -110,7 +110,7 @@ func DataTransaksi(data *kantin) {
 
 	fmt.Print("ID Tenant: ")
 	fmt.Scan(&IDTenant)
-	indexTenant := cariTenant(*data, IDTenant, 0)
+	indexTenant := cariTenant(*data, IDTenant)
 
 	if indexTenant == -1 {
 		fmt.Println("Tenant tidak ditemukan.")
@@ -156,14 +156,13 @@ func addTransaksi(t *tenant, IDTransaksi, namaPembeli, namaBarang string, totalB
 	}
 }
 
-func cariTenant(data kantin, IDTenant string, index int) int {
-	if index >= NMAX {
-		return -1
+func cariTenant(data kantin, IDTenant string) int {
+	for i := 0; i < NMAX; i++ {
+		if data[i].IDTenant == IDTenant {
+			return i
+		}
 	}
-	if data[index].IDTenant == IDTenant {
-		return index
-	}
-	return cariTenant(data, IDTenant, index+1)
+	return -1
 }
 
 func hapusData(data *kantin) {
@@ -193,7 +192,7 @@ func hapusTenant(data *kantin) {
 	fmt.Print("Masukkan ID Tenant yang ingin dihapus: ")
 	fmt.Scan(&IDTenant)
 
-	index := cariTenant(*data, IDTenant, 0)
+	index := cariTenant(*data, IDTenant)
 	if index == -1 {
 		fmt.Println("Tenant tidak ditemukan.")
 		return
@@ -210,13 +209,13 @@ func hapusTransaksi(data *kantin) {
 	fmt.Print("Masukkan ID Transaksi yang ingin dihapus: ")
 	fmt.Scan(&IDTransaksi)
 
-	indexTenant := cariTenant(*data, IDTenant, 0)
+	indexTenant := cariTenant(*data, IDTenant)
 	if indexTenant == -1 {
 		fmt.Println("Tenant tidak ditemukan.")
 		return
 	}
 
-	indexTransaksi := cariTransaksi(data[indexTenant], IDTransaksi, 0)
+	indexTransaksi := cariTransaksi(data[indexTenant], IDTransaksi)
 	if indexTransaksi == -1 {
 		fmt.Println("Transaksi tidak ditemukan.")
 		return
@@ -226,14 +225,13 @@ func hapusTransaksi(data *kantin) {
 	fmt.Println("Data transaksi telah dihapus.")
 }
 
-func cariTransaksi(tenant tenant, IDTransaksi string, index int) int {
-	if index >= tenant.jmlTransaksi {
-		return -1
+func cariTransaksi(t tenant, IDTransaksi string) int {
+	for i := 0; i < t.jmlTransaksi; i++ {
+		if t.tabTransaksi[i].IDTransaksi == IDTransaksi {
+			return i
+		}
 	}
-	if tenant.tabTransaksi[index].IDTransaksi == IDTransaksi {
-		return index
-	}
-	return cariTransaksi(tenant, IDTransaksi, index+1)
+	return -1
 }
 
 func ubahData(data *kantin) {
@@ -263,7 +261,7 @@ func ubahDataTenant(data *kantin) {
 	fmt.Print("Masukkan ID Tenant yang ingin diubah: ")
 	fmt.Scan(&IDTenant)
 
-	index := cariTenant(*data, IDTenant, 0)
+	index := cariTenant(*data, IDTenant)
 	if index == -1 {
 		fmt.Println("Tenant tidak ditemukan.")
 		return
@@ -282,7 +280,7 @@ func ubahDataTransaksi(data *kantin) {
 	fmt.Print("Masukkan ID Tenant: ")
 	fmt.Scan(&IDTenant)
 
-	indexTenant := cariTenant(*data, IDTenant, 0)
+	indexTenant := cariTenant(*data, IDTenant)
 	if indexTenant == -1 {
 		fmt.Println("Tenant tidak ditemukan.")
 		return
@@ -291,7 +289,7 @@ func ubahDataTransaksi(data *kantin) {
 	fmt.Print("Masukkan ID Transaksi yang ingin diubah: ")
 	fmt.Scan(&IDTransaksi)
 
-	indexTransaksi := cariTransaksi(data[indexTenant], IDTransaksi, 0)
+	indexTransaksi := cariTransaksi(data[indexTenant], IDTransaksi)
 	if indexTransaksi == -1 {
 		fmt.Println("Transaksi tidak ditemukan.")
 		return
@@ -331,7 +329,7 @@ func menuAdmin(data *kantin) {
 	fmt.Scan(&choice)
 
 	if choice == 1 {
-		printData(data, 0)
+		printData(data)
 	} else if choice == 2 {
 		printKomisiAdmin(data, 0, 0)
 	} else if choice == 3 {
@@ -342,29 +340,57 @@ func menuAdmin(data *kantin) {
 	menuAdmin(data)
 }
 
-func printData(data *kantin, index int) {
-	if index >= NMAX {
-		return
+func printData(data *kantin) {
+	sortedTenants := sortTenants(data)
+	for i, t := range sortedTenants {
+		if t.NamaTenant != "" {
+			fmt.Printf("Tenant %d: %s (ID: %s)\n", i+1, t.NamaTenant, t.IDTenant)
+			fmt.Printf("%10s %10s %15s %15s %10s %10s %10s\n",
+				"Transaksi", "ID", "Pembeli", "Barang", "TotalBeli", "Harga", "TotalHarga")
+			printTransaksi(t)
+		}
 	}
-
-	t := data[index]
-	if t.NamaTenant != "" {
-		fmt.Printf("Tenant %d: %s (ID: %s)\n", index+1, t.NamaTenant, t.IDTenant)
-		fmt.Printf("%10s %10s %15s %15s %10s %10s %10s\n", "Transaksi", "ID", "Pembeli", "Barang", "TotalBeli", "Harga", "TotalHarga")
-		printTransaksi(t, 0)
-	}
-	printData(data, index+1)
 }
 
-func printTransaksi(t tenant, index int) {
-	if index >= t.jmlTransaksi {
-		return
+func sortTenants(data *kantin) []tenant {
+	var sortedTenants []tenant
+	for _, t := range data {
+		if t.NamaTenant != "" {
+			sortedTenants = append(sortedTenants, t)
+		}
 	}
+	for i := 1; i < len(sortedTenants); i++ {
+		key := sortedTenants[i]
+		j := i - 1
+		for j >= 0 && sortedTenants[j].NamaTenant > key.NamaTenant {
+			sortedTenants[j+1] = sortedTenants[j]
+			j = j - 1
+		}
+		sortedTenants[j+1] = key
+	}
+	return sortedTenants
+}
 
-	trans := t.tabTransaksi[index]
-	fmt.Printf("%10d %10s %15s %15s %10d %10d %10d\n",
-		index+1, trans.IDTransaksi, trans.namaPembeli, trans.namaBarang, trans.totalBeli, trans.hargaBarang, trans.totalHarga)
-	printTransaksi(t, index+1)
+func printTransaksi(t tenant) {
+	sortTransaksi(&t)
+	for i := 0; i < t.jmlTransaksi; i++ {
+		trans := t.tabTransaksi[i]
+		fmt.Printf("%10d %10s %15s %15s %10d %10d %10d\n",
+			i+1, trans.IDTransaksi, trans.namaPembeli,
+			trans.namaBarang, trans.totalBeli, trans.hargaBarang, trans.totalHarga)
+	}
+}
+
+func sortTransaksi(t *tenant) {
+	for i := 1; i < t.jmlTransaksi; i++ {
+		key := t.tabTransaksi[i]
+		j := i - 1
+		for j >= 0 && t.tabTransaksi[j].IDTransaksi > key.IDTransaksi {
+			t.tabTransaksi[j+1] = t.tabTransaksi[j]
+			j = j - 1
+		}
+		t.tabTransaksi[j+1] = key
+	}
 }
 
 func printKomisiAdmin(data *kantin, index int, totalKomisi int) {
